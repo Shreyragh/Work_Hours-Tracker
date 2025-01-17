@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface LogHoursButtonProps {
   defaultHourlyRate?: number | null;
-  timeFormat: "12h" | "24h";
+  timeFormat: "12h" | "24h" | string;
   currencySymbol: string;
 }
 
@@ -161,7 +161,7 @@ export const LogHoursButton = ({
               onChange={(e) => setStartTime(e.target.value)}
             />
             <p className="text-sm text-muted-foreground">
-              {formatTimeString(startTime + ":00", timeFormat)}
+              {formatTimeString(startTime + ":00", timeFormat as "12h" | "24h")}
             </p>
           </div>
           <div className="grid gap-2">
@@ -173,7 +173,7 @@ export const LogHoursButton = ({
               onChange={(e) => setEndTime(e.target.value)}
             />
             <p className="text-sm text-muted-foreground">
-              {formatTimeString(endTime + ":00", timeFormat)}
+              {formatTimeString(endTime + ":00", timeFormat as "12h" | "24h")}
             </p>
           </div>
           <div className="grid gap-4">

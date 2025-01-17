@@ -25,6 +25,7 @@ import {
   updateNotificationSettings,
   updatePassword,
 } from "@/actions/account";
+import { CalendarSettings } from "@/components/calendar-settings";
 
 const Account = async () => {
   const supabase = await createClient();
@@ -83,7 +84,7 @@ const Account = async () => {
                           id="firstName"
                           name="firstName"
                           placeholder="Enter your first name"
-                          defaultValue={profile?.first_name}
+                          defaultValue={profile?.first_name ?? ""}
                         />
                       </div>
                       <div className="grid gap-2">
@@ -92,7 +93,7 @@ const Account = async () => {
                           id="lastName"
                           name="lastName"
                           placeholder="Enter your last name"
-                          defaultValue={profile?.last_name}
+                          defaultValue={profile?.last_name ?? ""}
                         />
                       </div>
                     </div>
@@ -123,7 +124,7 @@ const Account = async () => {
                           step="0.01"
                           min="0"
                           placeholder="Enter your default hourly rate"
-                          defaultValue={profile?.default_wage}
+                          defaultValue={profile?.default_wage ?? ""}
                         />
                       </div>
 
@@ -163,7 +164,7 @@ const Account = async () => {
                         <Label htmlFor="workWeek">Typical Work Week</Label>
                         <Select
                           name="workWeek"
-                          defaultValue={profile?.work_week}
+                          defaultValue={profile?.work_week ?? ""}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select your typical work days" />
@@ -186,7 +187,7 @@ const Account = async () => {
                         <Label htmlFor="currency">Preferred Currency</Label>
                         <Select
                           name="currency"
-                          defaultValue={profile?.currency}
+                          defaultValue={profile?.currency ?? ""}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select your currency" />
@@ -231,7 +232,7 @@ const Account = async () => {
                       </div>
                       <Switch
                         name="monthlyEmail"
-                        defaultChecked={profile?.monthly_email}
+                        defaultChecked={profile?.monthly_email ?? false}
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -243,7 +244,7 @@ const Account = async () => {
                       </div>
                       <Switch
                         name="weeklyEmail"
-                        defaultChecked={profile?.weekly_email}
+                        defaultChecked={profile?.weekly_email ?? false}
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -255,7 +256,7 @@ const Account = async () => {
                       </div>
                       <Switch
                         name="reminders"
-                        defaultChecked={profile?.reminders}
+                        defaultChecked={profile?.reminders ?? false}
                       />
                     </div>
                   </div>
@@ -308,6 +309,19 @@ const Account = async () => {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
+      <Separator />
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium">Calendar Integration</h3>
+          <p className="text-sm text-muted-foreground">
+            Sync your work hours with your favorite calendar app
+          </p>
+        </div>
+        <CalendarSettings
+          userId={user.id}
+          initialToken={profile?.calendar_token ?? null}
+        />
       </div>
     </div>
   );

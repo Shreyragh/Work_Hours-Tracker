@@ -111,7 +111,7 @@ const Dashboard = async () => {
           ? default_hourly_rate?.default_wage
           : log.custom_rate;
         return (
-          total + calculateHoursWorked(log.start_time!, log.end_time!) * rate
+          total + calculateHoursWorked(log.start_time!, log.end_time!) * rate!
         );
       }, 0) || 0
     );
@@ -143,7 +143,7 @@ const Dashboard = async () => {
   const weeklyData = weekDays.map((day, index) => {
     const dayLogs =
       currentWeekLogs?.filter((log) => {
-        const logDate = new Date(log.date);
+        const logDate = new Date(log.date!);
         return logDate.getDay() === (index + 1) % 7;
       }) || [];
     return {
@@ -263,24 +263,24 @@ const Dashboard = async () => {
             <div className="space-y-8">
               {recentLogs?.map((log) => {
                 const hours = calculateHoursWorked(
-                  log.start_time,
-                  log.end_time,
+                  log.start_time!,
+                  log.end_time!,
                 );
                 return (
                   <div key={log.id} className="flex items-center">
                     <div className="space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {format(new Date(log.date), "EEEE, MMMM d")}
+                        {format(new Date(log.date!), "EEEE, MMMM d")}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {formatTimeString(
-                          log.start_time,
-                          userProfile?.time_format,
+                          log.start_time!,
+                          userProfile?.time_format as "12h" | "24h",
                         )}{" "}
                         -{" "}
                         {formatTimeString(
-                          log.end_time,
-                          userProfile?.time_format,
+                          log.end_time!,
+                          userProfile?.time_format as "12h" | "24h",
                         )}
                       </p>
                     </div>
@@ -289,8 +289,8 @@ const Dashboard = async () => {
                       {(
                         hours *
                         (log.default_rate
-                          ? default_hourly_rate?.default_wage
-                          : log.custom_rate)
+                          ? (default_hourly_rate?.default_wage ?? 0)
+                          : (log.custom_rate ?? 0))
                       ).toFixed(2)}
                     </div>
                   </div>
