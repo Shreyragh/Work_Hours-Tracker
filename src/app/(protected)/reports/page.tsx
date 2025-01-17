@@ -33,7 +33,13 @@ const Reports = async () => {
   return (
     <ReportsClient
       user={user}
-      userProfile={userProfile}
+      userProfile={
+        userProfile as {
+          default_wage: number | null;
+          time_format: "12h" | "24h" | null;
+          currency: string | null;
+        } | null
+      }
       initialLogs={workLogs}
     />
   );

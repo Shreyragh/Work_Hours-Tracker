@@ -15,7 +15,12 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 
-const Login = async ({ searchParams }: { searchParams: { error: string } }) => {
+const Login = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ error: string }>;
+}) => {
+  const { error: searchParamsError } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
 
@@ -59,7 +64,7 @@ const Login = async ({ searchParams }: { searchParams: { error: string } }) => {
                 />
               </div>
 
-              {searchParams.error && (
+              {searchParamsError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Error</AlertTitle>

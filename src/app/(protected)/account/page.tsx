@@ -63,6 +63,7 @@ const Account = async () => {
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
             <TabsTrigger value="password">Password</TabsTrigger>
           </TabsList>
 
@@ -268,6 +269,21 @@ const Account = async () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="calendar">
+            <Card>
+              <CardHeader>
+                <CardTitle>Calendar Integration</CardTitle>
+                <CardDescription>
+                  Sync your work hours with your favorite calendar app
+                </CardDescription>
+              </CardHeader>
+              <CalendarSettings
+                userId={user.id}
+                initialToken={profile?.calendar_token ?? null}
+              />
+            </Card>
+          </TabsContent>
+
           <TabsContent value="password">
             <Card>
               <CardHeader>
@@ -309,19 +325,6 @@ const Account = async () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-      <Separator />
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium">Calendar Integration</h3>
-          <p className="text-sm text-muted-foreground">
-            Sync your work hours with your favorite calendar app
-          </p>
-        </div>
-        <CalendarSettings
-          userId={user.id}
-          initialToken={profile?.calendar_token ?? null}
-        />
       </div>
     </div>
   );

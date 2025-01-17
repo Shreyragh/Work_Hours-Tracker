@@ -70,6 +70,7 @@ const HomeHero = () => {
           <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
             {/* TODO: Add a screenshot of the app */}
             {/* TODO: change to nextjs image component */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt="App screenshot"
               src="https://tailwindui.com/plus/img/component-images/dark-project-app-screenshot.png"

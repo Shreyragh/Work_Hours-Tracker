@@ -38,9 +38,9 @@ type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 interface ReportsClientProps {
   user: User;
   userProfile: {
-    default_wage: number;
-    time_format: "12h" | "24h";
-    currency: string;
+    default_wage: number | null;
+    time_format: "12h" | "24h" | null;
+    currency: string | null;
   } | null;
   initialLogs: WorkLog[] | null;
 }

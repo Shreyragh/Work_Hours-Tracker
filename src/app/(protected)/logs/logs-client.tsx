@@ -1,30 +1,7 @@
 "use client";
 
 import { LogHoursButton } from "@/components/log-hours-button";
-import LogsFilters from "@/components/logs-filters";
 import LogsTableActions from "@/components/logs-table-actions";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -33,13 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { calculateHoursWorked, formatTimeString, cn } from "@/lib/utils";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { CalendarIcon, FilterIcon } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Database } from "@/lib/database.types";
 import { createClient } from "@/lib/supabase/client";
+import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { useEffect, useState, useCallback } from "react";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
@@ -55,14 +31,15 @@ interface FiltersState {
 interface LogsClientProps {
   user: User;
   userProfile: {
-    default_wage: number;
-    time_format: "12h" | "24h";
-    currency: string;
+    default_wage: number | null;
+    time_format: "12h" | "24h" | null;
+    currency: string | null;
   } | null;
   initialLogs: WorkLog[] | null;
 }
 
 const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filters, setFilters] = useState<FiltersState>({
     search: "",
     month: undefined,
@@ -81,7 +58,7 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
         ? "€"
         : "£";
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     const supabase = createClient();
     let query = supabase
       .from("work_logs")
@@ -225,12 +202,12 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
     } else {
       setLogs(data);
     }
-  };
+  }, [filters, user.id]);
 
   // Fetch logs when filters change
   useEffect(() => {
     fetchLogs();
-  }, [filters]);
+  }, [filters, fetchLogs]);
 
   return (
     <div className="flex-1 space-y-4 pt-6">
@@ -416,13 +393,13 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                     <TableCell className="text-nowrap">
                       {formatTimeString(
                         log.start_time!,
-                        userProfile?.time_format,
+                        userProfile?.time_format ?? "12h",
                       )}
                     </TableCell>
                     <TableCell className="text-nowrap">
                       {formatTimeString(
                         log.end_time!,
-                        userProfile?.time_format,
+                        userProfile?.time_format ?? "12h",
                       )}
                     </TableCell>
                     <TableCell>
@@ -445,7 +422,7 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                     <TableCell>
                       <LogsTableActions
                         log={log}
-                        defaultHourlyRate={userProfile?.default_wage}
+                        defaultHourlyRate={userProfile?.default_wage ?? 0}
                         timeFormat={userProfile?.time_format ?? "12h"}
                         currencySymbol={currencySymbol}
                       />
