@@ -107,7 +107,7 @@ export const LogHoursButton = ({
           <CardContent className="grid gap-2 p-0 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Hours Worked:</span>
-              <span className="font-medium">{hoursWorked}h</span>
+              <span className="font-medium">{hoursWorked.toFixed(2)}h</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Rate:</span>
