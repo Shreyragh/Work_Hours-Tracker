@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import LogsClient from "./logs-client";
+import ReportsClient from "./reports-client";
 
-const WorkLogs = async () => {
+const Reports = async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,19 +23,20 @@ const WorkLogs = async () => {
     .eq("user_id", user.id)
     .single();
 
-  const { data: initialLogs } = await supabase
+  // Fetch all work logs for the user
+  const { data: workLogs } = await supabase
     .from("work_logs")
     .select("*")
     .eq("user_id", user.id)
     .order("date", { ascending: false });
 
   return (
-    <LogsClient
+    <ReportsClient
       user={user}
       userProfile={userProfile}
-      initialLogs={initialLogs}
+      initialLogs={workLogs}
     />
   );
 };
 
-export default WorkLogs;
+export default Reports;

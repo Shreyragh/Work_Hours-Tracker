@@ -1,47 +1,64 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import EditLogDialog from "./edit-log-dialog";
-import { Button } from "./ui/button";
+import DeleteLogDialog from "./delete-log-dialog";
+import { format } from "date-fns";
+import { Database } from "@/lib/database.types";
 
-const LogsTableActions = ({ log }: { log: any }) => {
+type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
+
+interface LogsTableActionsProps {
+  log: WorkLog;
+  defaultHourlyRate: number;
+  timeFormat: "12h" | "24h";
+  currencySymbol: string;
+}
+
+const LogsTableActions = ({
+  log,
+  defaultHourlyRate,
+  timeFormat,
+  currencySymbol,
+}: LogsTableActionsProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-            Edit Log
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive">
-            Delete Log
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setEditDialogOpen(true)}
+        className="h-8 w-8"
+      >
+        <Edit className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setDeleteDialogOpen(true)}
+        className="h-8 w-8 text-destructive"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
       <EditLogDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         log={log}
+        defaultHourlyRate={defaultHourlyRate}
+        timeFormat={timeFormat}
+        currencySymbol={currencySymbol}
       />
-    </>
+      <DeleteLogDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        logId={Number(log.id)}
+        date={format(new Date(log.date!), "PPP")}
+      />
+    </div>
   );
 };
 

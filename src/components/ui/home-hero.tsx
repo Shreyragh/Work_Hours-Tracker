@@ -1,6 +1,6 @@
 const HomeHero = () => {
   return (
-    <div className="relative isolate h-[calc(100vh-57px)] overflow-hidden bg-gray-900">
+    <div className="relative isolate min-h-[calc(100vh-57px)] overflow-hidden bg-gray-900">
       <svg
         aria-hidden="true"
         className="absolute inset-0 -z-10 size-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"

@@ -1,11 +1,22 @@
 import { login } from "@/actions/auth";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { XCircleIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 
 const Login = async ({ searchParams }: { searchParams: { error: string } }) => {
   const supabase = await createClient();
-
   const { data } = await supabase.auth.getUser();
 
   if (data?.user) {
@@ -13,92 +24,74 @@ const Login = async ({ searchParams }: { searchParams: { error: string } }) => {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-57px)] items-center justify-center bg-background">
-      <div className="w-full max-w-md rounded-lg bg-foreground p-10 shadow-md">
-        <h1 className="mb-8 text-center text-2xl font-bold text-gray-800">
-          Login
-        </h1>
-        <form action={login}>
-          <div className="mb-5">
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              className="focus:shadow-outline w-full appearance-none rounded-md border border-gray-300 px-4 py-2 leading-tight text-gray-700 focus:border-indigo-500 focus:outline-none"
-              id="email"
-              type="email"
-              name="email"
-              required
-              placeholder="Enter your email"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              className="focus:shadow-outline mb-0 w-full appearance-none rounded-md border border-gray-300 px-4 py-2 leading-tight text-gray-700 focus:border-indigo-500 focus:outline-none"
-              id="password"
-              type="password"
-              name="password"
-              required
-              placeholder="Enter your password"
-            />
-          </div>
-          {searchParams.error && (
-            <div className="mb-4 rounded-md bg-red-100 p-4">
-              <div className="flex">
-                <div className="shrink-0">
-                  <XCircleIcon
-                    aria-hidden="true"
-                    className="size-5 text-red-400"
-                  />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
-                    Login Error
-                  </h3>
-                  <div className="mt-2 text-sm text-red-700">
-                    <ul role="list" className="list-disc space-y-1 pl-5">
-                      <li>
-                        Your email or password is incorrect. Please try again.
-                      </li>
-                    </ul>
-                  </div>
+    <div className="container relative flex min-h-[calc(100vh-57px)] items-center justify-center">
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <Card className="border-none">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold tracking-tight">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Enter your credentials to sign in to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form action={login} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  required
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  required
+                  className="w-full"
+                />
+              </div>
+
+              {searchParams.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>
+                    Your email or password is incorrect. Please try again.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full">
+                Sign In
+              </Button>
+
+              <div className="text-center text-sm">
+                <Link
+                  href="/signup"
+                  className="text-primary hover:text-primary/80"
+                >
+                  Don&apos;t have an account? Sign Up
+                </Link>
+                <div className="mt-2">
+                  <Link
+                    href="/forgot-password"
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    Forgot your password?
+                  </Link>
                 </div>
               </div>
-            </div>
-          )}
-          <div className="flex items-center justify-between">
-            <button
-              className="focus:shadow-outline w-full rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 focus:outline-none"
-              type="submit"
-            >
-              Sign In
-            </button>
-          </div>
-          <div className="mt-6 text-center">
-            <a
-              href="/signup"
-              className="inline-block align-baseline text-sm text-indigo-600 hover:text-indigo-800"
-            >
-              Sign Up
-            </a>
-            <span className="mx-2 text-gray-500">|</span>
-            <a
-              href="/forgot-password"
-              className="inline-block align-baseline text-sm text-indigo-600 hover:text-indigo-800"
-            >
-              Forgot Password?
-            </a>
-          </div>
-        </form>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
