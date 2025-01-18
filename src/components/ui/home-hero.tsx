@@ -76,18 +76,20 @@ const HomeHero = () => {
         <div className="mx-auto mt-16 flex max-w-2xl items-center lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
           <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
             <Image
-              alt="App screenshot"
               src="/screenshots/light.png"
+              alt="App screenshot In Light Mode"
               width={2432}
               height={1442}
-              className=" w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-black/5 dark:hidden dark:ring-white/10 lg:block"
+              className="block w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-gray-900/10 dark:hidden"
+              priority
             />
             <Image
-              alt="App screenshot"
               src="/screenshots/dark.png"
+              alt="App screenshot In Dark Mode"
               width={2432}
               height={1442}
-              className="hidden w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 dark:lg:block"
+              className="hidden w-[76rem] rounded-md bg-white/5 shadow-2xl ring-1 ring-gray-900/10 dark:block"
+              priority
             />
           </div>
         </div>

@@ -403,7 +403,11 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {calculateHoursWorked(log.start_time!, log.end_time!)}h
+                      {calculateHoursWorked(
+                        log.start_time!,
+                        log.end_time!,
+                      ).toFixed(2)}
+                      h
                     </TableCell>
                     <TableCell>
                       {currencySymbol}
