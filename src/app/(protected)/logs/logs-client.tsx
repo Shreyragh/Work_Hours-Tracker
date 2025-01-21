@@ -16,6 +16,10 @@ import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { useEffect, useState, useCallback } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Trash2, DollarSign } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
@@ -50,6 +54,7 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
   });
 
   const [logs, setLogs] = useState<WorkLog[] | null>(initialLogs);
+  const [selectedLogs, setSelectedLogs] = useState<number[]>([]);
 
   const currencySymbol =
     userProfile?.currency === "usd"
@@ -204,31 +209,102 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
     }
   }, [filters, user.id]);
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedLogs(logs?.map((log) => log.id) ?? []);
+    } else {
+      setSelectedLogs([]);
+    }
+  };
+
+  const handleSelectLog = (logId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedLogs((prev) => [...prev, logId]);
+    } else {
+      setSelectedLogs((prev) => prev.filter((id) => id !== logId));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("work_logs")
+      .delete()
+      .in("id", selectedLogs)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete selected logs",
+      });
+      console.error(error);
+    } else {
+      toast({
+        description: "Successfully deleted selected logs",
+      });
+      setSelectedLogs([]);
+      fetchLogs();
+    }
+  };
+
+  const handleMarkAsPaid = async () => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("work_logs")
+      .update({ paid: true })
+      .in("id", selectedLogs)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to mark logs as paid",
+      });
+      console.error(error);
+    } else {
+      toast({
+        description: "Successfully marked logs as paid",
+      });
+      setSelectedLogs([]);
+      fetchLogs();
+    }
+  };
+
   // Fetch logs when filters change
   useEffect(() => {
     fetchLogs();
   }, [filters, fetchLogs]);
 
   return (
-    <div className="flex-1 space-y-4 pt-6">
+    <div className="flex-1 space-y-4 pb-8 pt-6">
       <div className="container flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Work Logs</h2>
         <div className="flex items-center gap-2">
-          {/* <Sheet>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="outline" size="icon">
-                <FilterIcon className="h-4 w-4" />
+          {selectedLogs.length > 0 && (
+            <>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteSelected}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Selected ({selectedLogs.length})
               </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4">
-                <LogsFilters filters={filters} setFilters={setFilters} />
-              </div>
-            </SheetContent>
-          </Sheet> */}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleMarkAsPaid}
+                className="gap-2"
+              >
+                <DollarSign className="h-4 w-4" />
+                Mark as Paid ({selectedLogs.length})
+              </Button>
+            </>
+          )}
           <LogHoursButton
             defaultHourlyRate={userProfile?.default_wage}
             timeFormat={userProfile?.time_format ?? "12h"}
@@ -238,134 +314,20 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
       </div>
 
       <div className="container space-y-4">
-        {/* Desktop Filters */}
-        {/* <div className="hidden md:block">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex flex-1 flex-wrap items-center gap-2">
-              <Input
-                placeholder="Search logs..."
-                className="max-w-[250px]"
-                value={filters.search}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, search: e.target.value }))
-                }
-              />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-[200px] justify-start text-left font-normal",
-                      !filters.month && "text-muted-foreground",
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.month
-                      ? format(filters.month, "MMMM yyyy")
-                      : "Filter by month"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={filters.month}
-                    onSelect={(date) =>
-                      setFilters((prev) => ({ ...prev, month: date }))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Select
-                value={filters.hoursRange}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, hoursRange: value }))
-                }
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Hours range" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0-4">0-4 hours</SelectItem>
-                  <SelectItem value="4-8">4-8 hours</SelectItem>
-                  <SelectItem value="8+">8+ hours</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.startTime}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, startTime: value }))
-                }
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Start time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="early-morning-1">Before 6 AM</SelectItem>
-                  <SelectItem value="early-morning-2">6 AM - 7 AM</SelectItem>
-                  <SelectItem value="early-morning-3">7 AM - 8 AM</SelectItem>
-                  <SelectItem value="morning-1">8 AM - 9 AM</SelectItem>
-                  <SelectItem value="morning-2">9 AM - 10 AM</SelectItem>
-                  <SelectItem value="morning-3">10 AM - 11 AM</SelectItem>
-                  <SelectItem value="morning-4">11 AM - 12 PM</SelectItem>
-                  <SelectItem value="afternoon-1">12 PM - 1 PM</SelectItem>
-                  <SelectItem value="afternoon-2">1 PM - 2 PM</SelectItem>
-                  <SelectItem value="afternoon-3">2 PM - 3 PM</SelectItem>
-                  <SelectItem value="afternoon-4">3 PM - 4 PM</SelectItem>
-                  <SelectItem value="evening-1">4 PM - 5 PM</SelectItem>
-                  <SelectItem value="evening-2">5 PM - 6 PM</SelectItem>
-                  <SelectItem value="evening-3">After 6 PM</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.endTime}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, endTime: value }))
-                }
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="End time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="morning-1">Before 10 AM</SelectItem>
-                  <SelectItem value="morning-2">10 AM - 11 AM</SelectItem>
-                  <SelectItem value="morning-3">11 AM - 12 PM</SelectItem>
-                  <SelectItem value="afternoon-1">12 PM - 1 PM</SelectItem>
-                  <SelectItem value="afternoon-2">1 PM - 2 PM</SelectItem>
-                  <SelectItem value="afternoon-3">2 PM - 3 PM</SelectItem>
-                  <SelectItem value="afternoon-4">3 PM - 4 PM</SelectItem>
-                  <SelectItem value="evening-1">4 PM - 5 PM</SelectItem>
-                  <SelectItem value="evening-2">5 PM - 6 PM</SelectItem>
-                  <SelectItem value="evening-3">6 PM - 7 PM</SelectItem>
-                  <SelectItem value="evening-4">7 PM - 8 PM</SelectItem>
-                  <SelectItem value="late-evening-1">8 PM - 9 PM</SelectItem>
-                  <SelectItem value="late-evening-2">9 PM - 10 PM</SelectItem>
-                  <SelectItem value="late-evening-3">After 10 PM</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.rateType}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, rateType: value }))
-                }
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Rate type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Default Rate</SelectItem>
-                  <SelectItem value="custom">Custom Rate</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div> */}
-
         {/* Data Table */}
         <div className="rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={
+                      selectedLogs.length === (logs?.length ?? 0) &&
+                      logs!.length > 0
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-nowrap">Start Time</TableHead>
                 <TableHead className="text-nowrap">End Time</TableHead>
@@ -377,6 +339,7 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                   Earnings ({currencySymbol})
                 </TableHead>
                 <TableHead>Notes</TableHead>
+                <TableHead className="text-nowrap">Status</TableHead>
                 <TableHead className="w-[70px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -386,7 +349,18 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                   ? userProfile?.default_wage
                   : log.custom_rate;
                 return (
-                  <TableRow key={log.id}>
+                  <TableRow
+                    key={log.id}
+                    className={log.paid ? "bg-muted/50" : undefined}
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedLogs.includes(log.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectLog(log.id, !!checked)
+                        }
+                      />
+                    </TableCell>
                     <TableCell className="text-nowrap">
                       {format(new Date(log.date!), "PPP")}
                     </TableCell>
@@ -422,6 +396,15 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {log.notes}
+                    </TableCell>
+                    <TableCell className="text-nowrap">
+                      {log.paid ? (
+                        <span className="font-bold text-green-600">Paid</span>
+                      ) : (
+                        <span className="font-bold text-yellow-600">
+                          Unpaid
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <LogsTableActions

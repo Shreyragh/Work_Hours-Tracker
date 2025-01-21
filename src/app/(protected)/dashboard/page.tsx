@@ -160,6 +160,26 @@ const Dashboard = async () => {
     .eq("user_id", data.user.id)
     .single();
 
+  // Get all paid and unpaid logs
+  const { data: paidLogs } = await supabase
+    .from("work_logs")
+    .select("*")
+    .eq("user_id", data.user.id)
+    .eq("paid", true);
+
+  const { data: unpaidLogs } = await supabase
+    .from("work_logs")
+    .select("*")
+    .eq("user_id", data.user.id)
+    .eq("paid", false);
+
+  const totalPaidEarnings = calculateTotalEarnings(paidLogs || []);
+  const totalUnpaidEarnings = calculateTotalEarnings(unpaidLogs || []);
+  const percentagePaid =
+    totalPaidEarnings + totalUnpaidEarnings > 0
+      ? (totalPaidEarnings / (totalPaidEarnings + totalUnpaidEarnings)) * 100
+      : 0;
+
   const currencySymbol =
     userProfile?.currency === "usd"
       ? "$"
@@ -187,7 +207,32 @@ const Dashboard = async () => {
         </div>
       </div>
 
-      <div className="container grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Paid Earnings
+            </CardTitle>
+            <CurrencyIcon className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-500">
+              {currencySymbol}
+              {totalPaidEarnings.toFixed(2)}
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {percentagePaid.toFixed(0)}% of total paid
+              </p>
+              {totalUnpaidEarnings > 0 && (
+                <p className="text-xs text-yellow-500">
+                  ({currencySymbol}
+                  {totalUnpaidEarnings.toFixed(2)} unpaid)
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -199,10 +244,12 @@ const Dashboard = async () => {
             <div className="text-2xl font-bold">
               {currentWeekHours.toFixed(1)}h
             </div>
-            <p className="text-xs text-muted-foreground">
-              {hoursChange >= 0 ? "+" : ""}
-              {hoursChange.toFixed(1)}h from last week
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {hoursChange >= 0 ? "+" : ""}
+                {hoursChange.toFixed(1)}h from last week
+              </p>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -217,11 +264,13 @@ const Dashboard = async () => {
               {currencySymbol}
               {currentMonthEarnings.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              {earningsChange >= 0 ? "+" : ""}
-              {currencySymbol}
-              {earningsChange.toFixed(2)} from last month
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {earningsChange >= 0 ? "+" : ""}
+                {currencySymbol}
+                {earningsChange.toFixed(2)} from last month
+              </p>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -231,7 +280,9 @@ const Dashboard = async () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{daysWorkedThisMonth}</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">This month</p>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -245,10 +296,12 @@ const Dashboard = async () => {
             <div className="text-2xl font-bold">
               {averageDailyHours.toFixed(1)}h
             </div>
-            <p className="text-xs text-muted-foreground">
-              {averageHoursChange >= 0 ? "+" : ""}
-              {averageHoursChange.toFixed(1)}h from last month
-            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {averageHoursChange >= 0 ? "+" : ""}
+                {averageHoursChange.toFixed(1)}h from last month
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
