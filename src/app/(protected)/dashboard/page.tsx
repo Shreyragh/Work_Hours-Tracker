@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { LogHoursButton } from "@/components/log-hours-button";
 import {
   Card,
   CardContent,
@@ -7,6 +6,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Database } from "@/lib/database.types";
+import { createClient } from "@/lib/supabase/server";
+import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  subWeeks,
+} from "date-fns";
 import {
   CalendarDays,
   Clock,
@@ -15,18 +26,7 @@ import {
   LineChart,
   PoundSterling,
 } from "lucide-react";
-import { LogHoursButton } from "@/components/log-hours-button";
-import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
-import {
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  format,
-  subMonths,
-  subWeeks,
-} from "date-fns";
-import { Database } from "@/lib/database.types";
+import { redirect } from "next/navigation";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 

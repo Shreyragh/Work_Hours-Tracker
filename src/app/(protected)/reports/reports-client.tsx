@@ -1,37 +1,39 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn, calculateHoursWorked } from "@/lib/utils";
 import { Database } from "@/lib/database.types";
+import { calculateHoursWorked, cn } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
-import { useState } from "react";
+import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
 import {
   CalendarIcon,
-  Download,
   Clock,
   DollarSign,
-  Users,
+  Download,
+  EuroIcon,
+  PoundSterling,
   TrendingUp,
+  Users,
 } from "lucide-react";
-import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
 import {
   Bar,
   BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
   Line,
   LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { DateRange } from "react-day-picker";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
@@ -63,6 +65,13 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
       : userProfile?.currency === "eur"
         ? "€"
         : "£";
+
+  const CurrencyIcon =
+    userProfile?.currency === "usd"
+      ? DollarSign
+      : userProfile?.currency === "eur"
+        ? EuroIcon
+        : PoundSterling;
 
   // Filter logs based on date range
   const filteredLogs = initialLogs?.filter((log) => {
@@ -233,7 +242,7 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
               <CardTitle className="text-sm font-medium">
                 Total Earnings
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">

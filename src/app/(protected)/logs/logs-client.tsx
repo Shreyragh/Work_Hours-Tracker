@@ -362,7 +362,7 @@ const LogsClient = ({ user, userProfile, initialLogs }: LogsClientProps) => {
                       />
                     </TableCell>
                     <TableCell className="text-nowrap">
-                      {format(new Date(log.date!), "PPP")}
+                      {format(new Date(log.date!), "EEE do MMM, yyyy")}
                     </TableCell>
                     <TableCell className="text-nowrap">
                       {formatTimeString(
