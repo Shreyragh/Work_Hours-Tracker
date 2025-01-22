@@ -1,4 +1,5 @@
 import { LogHoursButton } from "@/components/log-hours-button";
+import { ClockButton } from "@/components/clock-button";
 import {
   Card,
   CardContent,
@@ -199,11 +200,14 @@ const Dashboard = async () => {
       <div className="container flex flex-col gap-4 space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex w-full sm:w-auto">
-          <LogHoursButton
-            defaultHourlyRate={default_hourly_rate?.default_wage}
-            timeFormat={userProfile?.time_format ?? "12h"}
-            currencySymbol={currencySymbol}
-          />
+          <div className="flex items-center gap-4">
+            <ClockButton />
+            <LogHoursButton
+              defaultHourlyRate={default_hourly_rate?.default_wage}
+              timeFormat={userProfile?.time_format ?? "12h"}
+              currencySymbol={currencySymbol}
+            />
+          </div>
         </div>
       </div>
 

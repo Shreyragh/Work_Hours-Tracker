@@ -1,17 +1,15 @@
 import HomeHero from "@/components/ui/home-hero";
-import { redirect } from "next/navigation";
+import { ClockPage } from "@/components/clock-page";
 import { createClient } from "@/lib/supabase/server";
 
 const HomePage = async () => {
   const supabase = await createClient();
 
-  const { data } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (data?.user) {
-    redirect("/dashboard");
-  }
-
-  return <HomeHero />;
+  return !user?.id ? <HomeHero /> : <ClockPage />;
 };
 
 export default HomePage;

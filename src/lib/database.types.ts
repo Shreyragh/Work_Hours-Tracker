@@ -63,6 +63,36 @@ export type Database = {
         }
         Relationships: []
       }
+      clock_sessions: {
+        Row: {
+          id: number
+          user_id: string
+          clock_in_time: string
+          clock_out_time: string | null
+          created_at: string
+          updated_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          clock_in_time: string
+          clock_out_time?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          clock_in_time?: string
+          clock_out_time?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
       work_logs: {
         Row: {
           created_at: string
