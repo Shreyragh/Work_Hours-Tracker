@@ -89,146 +89,155 @@ export const LogHoursButton = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Log Hours
+        <Button className="w-full sm:w-auto">
+          <Plus className="mr-2 h-4 w-4" /> Log Hours
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Log Work Hours</DialogTitle>
+      <DialogContent className="flex h-full flex-col p-0 sm:h-auto sm:max-w-[425px]">
+        <DialogHeader className="p-6 pb-4">
+          <DialogTitle>Log Hours</DialogTitle>
           <DialogDescription>
-            Add a new work session to your logs
+            Log your work hours and earnings. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Summary Card */}
-        <Card className="border-none bg-muted p-4">
-          <CardContent className="grid gap-2 p-0 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Hours Worked:</span>
-              <span className="font-medium">{hoursWorked.toFixed(2)}h</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Rate:</span>
-              <span className="font-medium">
-                {currencySymbol}
-                {currentRate?.toFixed(2)}/h
-              </span>
-            </div>
-            <div className="flex justify-between border-t pt-2">
-              <span className="text-muted-foreground">Total Earnings:</span>
-              <span className="font-medium">
-                {currencySymbol}
-                {earnings?.toFixed(2)}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <form onSubmit={handleSubmit} className="grid gap-4 pt-4">
-          <div className="grid gap-2">
-            <Label htmlFor="date">Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="startTime">Start Time</Label>
-            <Input
-              id="startTime"
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              {formatTimeString(startTime + ":00", timeFormat as "12h" | "24h")}
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="endTime">End Time</Label>
-            <Input
-              id="endTime"
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              {formatTimeString(endTime + ":00", timeFormat as "12h" | "24h")}
-            </p>
-          </div>
-          <div className="grid gap-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="defaultWage"
-                checked={useDefaultWage}
-                onCheckedChange={(checked) => {
-                  setUseDefaultWage(checked as boolean);
-                  if (checked) {
-                    setRate(defaultHourlyRate!);
-                  }
-                }}
-              />
-              <Label htmlFor="defaultWage" className="font-normal">
-                Use My Default Wage
-              </Label>
-            </div>
-            {!useDefaultWage && (
-              <div className="grid gap-2">
-                <Label htmlFor="rate">
-                  Custom Hourly Rate ({currencySymbol})
-                </Label>
-                <Input
-                  id="rate"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={rate}
-                  onChange={(e) => setRate(parseFloat(e.target.value))}
-                  placeholder="Enter custom hourly rate"
-                />
+        <div className="flex-1 overflow-y-auto px-6">
+          {/* Summary Card */}
+          <Card className="border-none bg-muted p-4">
+            <CardContent className="grid gap-2 p-0 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Hours Worked:</span>
+                <span className="font-medium">{hoursWorked.toFixed(2)}h</span>
               </div>
-            )}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Input
-              id="notes"
-              placeholder="Add any notes about this work session"
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </form>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Rate:</span>
+                <span className="font-medium">
+                  {currencySymbol}
+                  {currentRate?.toFixed(2)}/h
+                </span>
+              </div>
+              <div className="flex justify-between border-t pt-2">
+                <span className="text-muted-foreground">Total Earnings:</span>
+                <span className="font-medium">
+                  {currencySymbol}
+                  {earnings?.toFixed(2)}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <form onSubmit={handleSubmit} id="work-log-form" className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date">Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="startTime">Start Time</Label>
+              <Input
+                id="startTime"
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                {formatTimeString(startTime + ":00", timeFormat as "12h" | "24h")}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="endTime">End Time</Label>
+              <Input
+                id="endTime"
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                {formatTimeString(endTime + ":00", timeFormat as "12h" | "24h")}
+              </p>
+            </div>
+            <div className="grid gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="defaultWage"
+                  checked={useDefaultWage}
+                  onCheckedChange={(checked) => {
+                    setUseDefaultWage(checked as boolean);
+                    if (checked) {
+                      setRate(defaultHourlyRate!);
+                    }
+                  }}
+                />
+                <Label htmlFor="defaultWage" className="font-normal">
+                  Use My Default Wage
+                </Label>
+              </div>
+              {!useDefaultWage && (
+                <div className="grid gap-2">
+                  <Label htmlFor="rate">
+                    Custom Hourly Rate ({currencySymbol})
+                  </Label>
+                  <Input
+                    id="rate"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={rate}
+                    onChange={(e) => setRate(parseFloat(e.target.value))}
+                    placeholder="Enter custom hourly rate"
+                  />
+                </div>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Input
+                id="notes"
+                name="notes"
+                placeholder="Add any notes about this work session"
+              />
+            </div>
+          </form>
+        </div>
+
+        <div className="flex flex-col gap-4 border-t bg-background p-6 pt-4 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button 
+            form="work-log-form"
+            type="submit" 
+            className="w-full sm:w-auto" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Save"}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

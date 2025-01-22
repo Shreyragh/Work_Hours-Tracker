@@ -60,12 +60,14 @@ const Account = async () => {
       <Separator className="my-6" />
       <div className="container flex flex-col space-y-8 lg:flex-row lg:space-y-0">
         <Tabs defaultValue="general" className="w-full">
-          <TabsList>
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            <TabsTrigger value="password">Password</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="inline-flex w-full min-w-max">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar</TabsTrigger>
+              <TabsTrigger value="password">Password</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="general">
             <Card>

@@ -96,6 +96,13 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
     );
   }, 0);
 
+  // Calculate projected earnings
+  const daysInCurrentPeriod = filteredLogs?.length || 1;
+  const averageDailyEarnings = (totalEarnings || 0) / daysInCurrentPeriod;
+
+  const projectedMonthlyEarnings = averageDailyEarnings * 21; // Assuming 21 working days per month
+  const projectedYearlyEarnings = projectedMonthlyEarnings * 12;
+
   // Prepare data for charts
   const dailyData = filteredLogs?.reduce((acc: DailyData[], log) => {
     const date = format(new Date(log.date!), "MMM d");
@@ -165,16 +172,16 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
   };
 
   return (
-    <div className="flex-1 space-y-4 pt-6">
-      <div className="container flex items-center justify-between space-y-2">
+    <div className="flex-1 space-y-4 pb-8 pt-6">
+      <div className="container flex flex-col gap-4 space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <h2 className="text-3xl font-bold tracking-tight">Reports</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className={cn(
-                  "justify-start text-left font-normal",
+                  "w-full justify-start text-left font-normal sm:w-[300px]",
                   !dateRange && "text-muted-foreground",
                 )}
               >
@@ -197,7 +204,6 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
                 selected={dateRange}
                 onSelect={(newDateRange) => {
                   if (newDateRange?.from) {
-                    // If only start date is selected, keep the existing end date
                     if (!newDateRange.to && dateRange?.to) {
                       setDateRange({
                         from: newDateRange.from,
@@ -210,14 +216,14 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
                     setDateRange(undefined);
                   }
                 }}
-                numberOfMonths={2}
+                numberOfMonths={1}
                 disabled={(date) =>
                   date > new Date() || date < new Date("2000-01-01")
                 }
               />
             </PopoverContent>
           </Popover>
-          <Button onClick={exportToCSV}>
+          <Button onClick={exportToCSV} className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
@@ -233,7 +239,7 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {totalHours?.toFixed(1)}h
+                {totalHours?.toFixed(1) ?? 0}h
               </div>
             </CardContent>
           </Card>
@@ -247,7 +253,7 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
             <CardContent>
               <div className="text-2xl font-bold">
                 {currencySymbol}
-                {totalEarnings?.toFixed(2)}
+                {totalEarnings?.toFixed(2) ?? 0}
               </div>
             </CardContent>
           </Card>
@@ -269,13 +275,50 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
               <CardTitle className="text-sm font-medium">
                 Average Daily Earnings
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {currencySymbol}
                 {(totalEarnings! / (dailyData?.length || 1)).toFixed(2)}
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Projected Monthly
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {currencySymbol}
+                {projectedMonthlyEarnings.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Based on current pace (21 working days)
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Projected Yearly
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {currencySymbol}
+                {projectedYearlyEarnings.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Based on current pace (252 working days)
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -303,11 +346,23 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
                       axisLine={false}
                       tickFormatter={(value: number) => `${value}h`}
                     />
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "0.5rem",
+                      }}
+                      labelStyle={{
+                        color: "hsl(var(--popover-foreground))",
+                      }}
+                      itemStyle={{
+                        color: "hsl(var(--popover-foreground))",
+                      }}
+                    />
                     <Bar
                       dataKey="hours"
                       fill="currentColor"
-                      radius={[4, 4, 0, 0]}
+                      radius={[6, 6, 0, 0]}
                       className="fill-primary"
                     />
                   </BarChart>
@@ -339,7 +394,19 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
                         `${currencySymbol}${value.toFixed(0)}`
                       }
                     />
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "0.5rem",
+                      }}
+                      labelStyle={{
+                        color: "hsl(var(--popover-foreground))",
+                      }}
+                      itemStyle={{
+                        color: "hsl(var(--popover-foreground))",
+                      }}
+                    />
                     <Line
                       type="monotone"
                       dataKey="earnings"

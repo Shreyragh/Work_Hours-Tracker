@@ -195,10 +195,10 @@ const Dashboard = async () => {
         : PoundSterling;
 
   return (
-    <div className="flex-1 space-y-4 pt-6">
-      <div className="container flex items-center justify-between space-y-2">
+    <div className="flex-1 space-y-4 pb-8 pt-6">
+      <div className="container flex flex-col gap-4 space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex items-center space-x-2">
+        <div className="flex w-full sm:w-auto">
           <LogHoursButton
             defaultHourlyRate={default_hourly_rate?.default_wage}
             timeFormat={userProfile?.time_format ?? "12h"}
@@ -207,177 +207,179 @@ const Dashboard = async () => {
         </div>
       </div>
 
-      <div className="container grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Paid Earnings
-            </CardTitle>
-            <CurrencyIcon className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-500">
-              {currencySymbol}
-              {totalPaidEarnings.toFixed(2)}
-            </div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">
-                {percentagePaid.toFixed(0)}% of total paid
-              </p>
-              {totalUnpaidEarnings > 0 && (
-                <p className="text-xs text-yellow-500">
-                  ({currencySymbol}
-                  {totalUnpaidEarnings.toFixed(2)} unpaid)
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Hours This Week
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currentWeekHours.toFixed(1)}h
-            </div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">
-                {hoursChange >= 0 ? "+" : ""}
-                {hoursChange.toFixed(1)}h from last week
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              This Month&apos;s Earnings
-            </CardTitle>
-            <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {currencySymbol}
-              {currentMonthEarnings.toFixed(2)}
-            </div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">
-                {earningsChange >= 0 ? "+" : ""}
+      <div className="container space-y-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Paid Earnings
+              </CardTitle>
+              <CurrencyIcon className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-500">
                 {currencySymbol}
-                {earningsChange.toFixed(2)} from last month
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Days Worked</CardTitle>
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{daysWorkedThisMonth}</div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">This month</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Average Daily Hours
-            </CardTitle>
-            <LineChart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {averageDailyHours.toFixed(1)}h
-            </div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">
-                {averageHoursChange >= 0 ? "+" : ""}
-                {averageHoursChange.toFixed(1)}h from last month
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                {totalPaidEarnings.toFixed(2)}
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {percentagePaid.toFixed(0)}% of total paid
+                </p>
+                {totalUnpaidEarnings > 0 && (
+                  <p className="text-xs text-yellow-500">
+                    ({currencySymbol}
+                    {totalUnpaidEarnings.toFixed(2)} unpaid)
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Hours This Week
+              </CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {currentWeekHours.toFixed(1)}h
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {hoursChange >= 0 ? "+" : ""}
+                  {hoursChange.toFixed(1)}h from last week
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                This Month&apos;s Earnings
+              </CardTitle>
+              <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {currencySymbol}
+                {currentMonthEarnings.toFixed(2)}
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {earningsChange >= 0 ? "+" : ""}
+                  {currencySymbol}
+                  {earningsChange.toFixed(2)} from last month
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Days Worked</CardTitle>
+              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{daysWorkedThisMonth}</div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">This month</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Average Daily Hours
+              </CardTitle>
+              <LineChart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {averageDailyHours.toFixed(1)}h
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {averageHoursChange >= 0 ? "+" : ""}
+                  {averageHoursChange.toFixed(1)}h from last month
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="container grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Work Logs</CardTitle>
-            <CardDescription>Your recent work activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-8">
-              {recentLogs?.map((log) => {
-                const hours = calculateHoursWorked(
-                  log.start_time!,
-                  log.end_time!,
-                );
-                return (
-                  <div key={log.id} className="flex items-center">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {format(new Date(log.date!), "EEEE, MMMM d")}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatTimeString(
-                          log.start_time!,
-                          userProfile?.time_format as "12h" | "24h",
-                        )}{" "}
-                        -{" "}
-                        {formatTimeString(
-                          log.end_time!,
-                          userProfile?.time_format as "12h" | "24h",
-                        )}
-                      </p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle>Recent Work Logs</CardTitle>
+              <CardDescription>Your recent work activity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {recentLogs?.map((log) => {
+                  const hours = calculateHoursWorked(
+                    log.start_time!,
+                    log.end_time!,
+                  );
+                  return (
+                    <div key={log.id} className="flex items-center">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {format(new Date(log.date!), "EEEE, MMMM d")}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatTimeString(
+                            log.start_time!,
+                            userProfile?.time_format as "12h" | "24h",
+                          )}{" "}
+                          -{" "}
+                          {formatTimeString(
+                            log.end_time!,
+                            userProfile?.time_format as "12h" | "24h",
+                          )}
+                        </p>
+                      </div>
+                      <div className="ml-auto font-medium">
+                        {hours.toFixed(1)} hours • {currencySymbol}
+                        {(
+                          hours *
+                          (log.default_rate
+                            ? (default_hourly_rate?.default_wage ?? 0)
+                            : (log.custom_rate ?? 0))
+                        ).toFixed(2)}
+                      </div>
                     </div>
-                    <div className="ml-auto font-medium">
-                      {hours.toFixed(1)} hours • {currencySymbol}
-                      {(
-                        hours *
-                        (log.default_rate
-                          ? (default_hourly_rate?.default_wage ?? 0)
-                          : (log.custom_rate ?? 0))
-                      ).toFixed(2)}
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="col-span-4 lg:col-span-3">
+            <CardHeader>
+              <CardTitle>Weekly Overview</CardTitle>
+              <CardDescription>Hours worked per day this week</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {weeklyData.map(({ day, hours }) => (
+                  <div key={day} className="flex items-center">
+                    <div className="min-w-[4rem] font-medium">{day}</div>
+                    <div className="flex flex-1 items-center gap-2">
+                      <div
+                        className="h-2 bg-primary"
+                        style={{
+                          width: `${(hours / maxHours) * 100}%`,
+                        }}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {hours.toFixed(1)}h
+                      </span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="col-span-4 lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Weekly Overview</CardTitle>
-            <CardDescription>Hours worked per day this week</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-8">
-              {weeklyData.map(({ day, hours }) => (
-                <div key={day} className="flex items-center">
-                  <div className="min-w-[4rem] font-medium">{day}</div>
-                  <div className="flex flex-1 items-center gap-2">
-                    <div
-                      className="h-2 bg-primary"
-                      style={{
-                        width: `${(hours / maxHours) * 100}%`,
-                      }}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {hours.toFixed(1)}h
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
