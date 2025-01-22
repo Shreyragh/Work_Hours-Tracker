@@ -73,6 +73,16 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const formatColumnHeader = (text: string) => {
+    const formatted = text
+      .replace(/([A-Z])/g, " $1")
+      .replace(/_/g, " ")
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+
+    return formatted;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -96,7 +106,7 @@ export function DataTable<TData, TValue>({
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {formatColumnHeader(column.id)}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -114,7 +124,11 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
+                            typeof header.column.columnDef.header === "string"
+                              ? formatColumnHeader(
+                                  header.column.columnDef.header as string,
+                                )
+                              : header.column.columnDef.header,
                             header.getContext(),
                           )}
                     </TableHead>
