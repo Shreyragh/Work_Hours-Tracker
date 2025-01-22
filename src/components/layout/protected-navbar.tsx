@@ -33,10 +33,7 @@ const ProtectedNavbar = () => {
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden w-full justify-between md:flex">
           <div className="flex items-center space-x-4">
-            <Link
-              href="/dashboard"
-              className="mr-6 flex items-center space-x-2"
-            >
+            <Link href="/" className="mr-6 flex items-center space-x-2">
               <span className="hidden font-bold sm:inline-block">
                 Work Hours Tracker
               </span>
