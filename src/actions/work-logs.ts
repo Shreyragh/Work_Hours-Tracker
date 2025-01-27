@@ -38,6 +38,8 @@ export async function createWorkLog(formData: FormData) {
   }
 
   revalidatePath("/logs");
+  revalidatePath("/reports");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -81,6 +83,8 @@ export async function updateWorkLog(formData: FormData) {
   }
 
   revalidatePath("/logs");
+  revalidatePath("/reports");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -107,7 +111,6 @@ export async function deleteWorkLog(id: number) {
 
     revalidatePath("/logs");
     revalidatePath("/reports");
-    revalidatePath("/");
     revalidatePath("/dashboard");
 
     return { success: true };

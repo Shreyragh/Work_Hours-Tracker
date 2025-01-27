@@ -31,6 +31,8 @@ import { redirect } from "next/navigation";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
+export const revalidate = 3600;
+
 const Dashboard = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();

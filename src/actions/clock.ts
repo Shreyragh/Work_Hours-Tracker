@@ -38,7 +38,9 @@ export async function clockIn() {
     throw new Error("Failed to clock in");
   }
 
+  revalidatePath("/", "layout");
   revalidatePath("/");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -97,7 +99,11 @@ export async function clockOut() {
 
   console.log(workLogData);
 
+  revalidatePath("/logs");
+  revalidatePath("/reports");
+  revalidatePath("/", "layout");
   revalidatePath("/");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 

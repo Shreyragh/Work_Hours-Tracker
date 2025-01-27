@@ -1,19 +1,27 @@
-"use client";
-
-import { ClockButton } from "./clock-button";
+import { createClient } from "@/lib/supabase/server";
+import { ClockPageClient } from "./clock-page-client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useEffect, useState } from "react";
-import { getCurrentClockStatus } from "@/actions/clock";
-import { format, parseISO } from "date-fns";
 
-export function ClockPage() {
-  const [clockInTime, setClockInTime] = useState<string | null>(null);
+export async function ClockPage() {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    getCurrentClockStatus().then((status) => {
-      setClockInTime(status.clockInTime || null);
-    });
-  }, []);
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error("Unauthorized");
+  }
+
+  const { data: userProfile } = await supabase
+    .from("user_profiles")
+    .select("default_wage, currency")
+    .eq("user_id", user.id)
+    .single();
+
+  const hourlyRate = userProfile?.default_wage || 15;
+  const currency = userProfile?.currency || "USD";
 
   return (
     <div className="container mx-auto max-w-2xl py-8">
@@ -22,23 +30,7 @@ export function ClockPage() {
           <CardTitle className="text-center text-2xl">Time Tracker</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center gap-6 py-8">
-            <div className="text-center">
-              {clockInTime ? (
-                <div className="mb-4 text-lg">
-                  <p>Clocked in at</p>
-                  <p className="font-mono text-2xl font-bold">
-                    {format(parseISO(clockInTime), "h:mm a")}
-                  </p>
-                </div>
-              ) : (
-                <p className="mb-4 text-lg text-muted-foreground">
-                  You are currently clocked out
-                </p>
-              )}
-            </div>
-            <ClockButton />
-          </div>
+          <ClockPageClient hourlyRate={hourlyRate} currency={currency} />
         </CardContent>
       </Card>
     </div>
