@@ -17,15 +17,6 @@ export async function GET(
     .eq("user_id", userId)
     .single();
 
-  console.log(profile);
-
-  console.log("Debug token verification:", {
-    storedToken: profile?.calendar_token,
-    receivedToken: token,
-    slicedToken: token.slice(0, -4),
-    match: profile?.calendar_token === token.slice(0, -4),
-  });
-
   if (profile?.calendar_token !== token.slice(0, -4)) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
@@ -36,8 +27,6 @@ export async function GET(
     .select("*")
     .eq("user_id", userId)
     .order("start_time", { ascending: true });
-
-  console.log("Work logs:", logs);
 
   if (!logs) {
     return new NextResponse("No logs found", { status: 404 });
@@ -54,13 +43,6 @@ export async function GET(
 
   // Add some debug logging in the forEach
   logs.forEach((log) => {
-    console.log("Processing log:", {
-      hasRequiredFields: !!(log.date && log.start_time && log.end_time),
-      date: log.date,
-      start_time: log.start_time,
-      end_time: log.end_time,
-    });
-
     if (log.date && log.start_time && log.end_time) {
       // Parse the date and times
       const date = new Date(log.date);
