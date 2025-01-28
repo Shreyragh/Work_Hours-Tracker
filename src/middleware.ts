@@ -5,6 +5,13 @@ import type { NextRequest } from "next/server";
 const publicRoutes = ["/", "/login", "/signup"];
 
 export default async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // Allow calendar API requests to bypass auth
+  if (path.startsWith("/api/calendar/")) {
+    return NextResponse.next();
+  }
+
   const response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -17,7 +24,6 @@ export default async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.includes(path);
 
   if (user && !user.user_metadata?.onboarding_completed)
