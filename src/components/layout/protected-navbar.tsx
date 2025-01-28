@@ -41,7 +41,7 @@ const ProtectedNavbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <Link href="/" legacyBehavior passHref>
+                  <Link href="/time-tracker" legacyBehavior passHref>
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle()}
                     >

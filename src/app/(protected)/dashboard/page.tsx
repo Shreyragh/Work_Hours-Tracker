@@ -1,5 +1,5 @@
 import { LogHoursButton } from "@/components/log-hours-button";
-import { ClockButton } from "@/components/clock-button";
+import { ClockStatus } from "@/components/dashboard/clock-status";
 import {
   Card,
   CardContent,
@@ -17,6 +17,7 @@ import {
   startOfMonth,
   startOfWeek,
   subMonths,
+  addMonths,
   subWeeks,
 } from "date-fns";
 import {
@@ -26,14 +27,21 @@ import {
   EuroIcon,
   LineChart,
   PoundSterling,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
 export const revalidate = 3600;
 
-const Dashboard = async () => {
+const Dashboard = async ({
+  searchParams,
+}: {
+  searchParams: { month?: string };
+}) => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
 
@@ -48,6 +56,15 @@ const Dashboard = async () => {
     .eq("user_id", data.user.id)
     .single();
 
+  // Handle month navigation
+  const today = new Date();
+  const selectedMonth = searchParams.month
+    ? new Date(searchParams.month)
+    : today;
+  const prevMonth = format(subMonths(selectedMonth, 1), "yyyy-MM");
+  const nextMonth = format(addMonths(selectedMonth, 1), "yyyy-MM");
+
+  // Current week data
   const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
   const currentWeekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
   const { data: currentWeekLogs } = await supabase
@@ -69,23 +86,24 @@ const Dashboard = async () => {
     .gte("date", lastWeekStart.toISOString())
     .lte("date", lastWeekEnd.toISOString());
 
-  const currentMonthStart = startOfMonth(new Date());
-  const currentMonthEnd = endOfMonth(new Date());
-  const { data: currentMonthLogs } = await supabase
+  // Selected month data
+  const selectedMonthStart = startOfMonth(selectedMonth);
+  const selectedMonthEnd = endOfMonth(selectedMonth);
+  const { data: selectedMonthLogs } = await supabase
     .from("work_logs")
     .select("*")
     .eq("user_id", data.user.id)
-    .gte("date", currentMonthStart.toISOString())
-    .lte("date", currentMonthEnd.toISOString());
+    .gte("date", selectedMonthStart.toISOString())
+    .lte("date", selectedMonthEnd.toISOString());
 
-  const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
-  const lastMonthEnd = endOfMonth(subMonths(new Date(), 1));
-  const { data: lastMonthLogs } = await supabase
+  const prevMonthStart = startOfMonth(subMonths(selectedMonth, 1));
+  const prevMonthEnd = endOfMonth(subMonths(selectedMonth, 1));
+  const { data: prevMonthLogs } = await supabase
     .from("work_logs")
     .select("*")
     .eq("user_id", data.user.id)
-    .gte("date", lastMonthStart.toISOString())
-    .lte("date", lastMonthEnd.toISOString());
+    .gte("date", prevMonthStart.toISOString())
+    .lte("date", prevMonthEnd.toISOString());
 
   // Get recent logs for the list
   const { data: recentLogs } = await supabase
@@ -121,23 +139,23 @@ const Dashboard = async () => {
   const lastWeekHours = calculateTotalHours(lastWeekLogs || []);
   const hoursChange = currentWeekHours - lastWeekHours;
 
-  const currentMonthEarnings = calculateTotalEarnings(currentMonthLogs || []);
-  const lastMonthEarnings = calculateTotalEarnings(lastMonthLogs || []);
-  const earningsChange = currentMonthEarnings - lastMonthEarnings;
+  const selectedMonthEarnings = calculateTotalEarnings(selectedMonthLogs || []);
+  const prevMonthEarnings = calculateTotalEarnings(prevMonthLogs || []);
+  const earningsChange = selectedMonthEarnings - prevMonthEarnings;
 
-  const daysWorkedThisMonth = new Set(currentMonthLogs?.map((log) => log.date))
+  const daysWorkedThisMonth = new Set(selectedMonthLogs?.map((log) => log.date))
     .size;
 
   const averageDailyHours = daysWorkedThisMonth
-    ? calculateTotalHours(currentMonthLogs || []) / daysWorkedThisMonth
+    ? calculateTotalHours(selectedMonthLogs || []) / daysWorkedThisMonth
     : 0;
 
-  const lastMonthDaysWorked = new Set(lastMonthLogs?.map((log) => log.date))
+  const prevMonthDaysWorked = new Set(prevMonthLogs?.map((log) => log.date))
     .size;
-  const lastMonthAverageDailyHours = lastMonthDaysWorked
-    ? calculateTotalHours(lastMonthLogs || []) / lastMonthDaysWorked
+  const prevMonthAverageDailyHours = prevMonthDaysWorked
+    ? calculateTotalHours(prevMonthLogs || []) / prevMonthDaysWorked
     : 0;
-  const averageHoursChange = averageDailyHours - lastMonthAverageDailyHours;
+  const averageHoursChange = averageDailyHours - prevMonthAverageDailyHours;
 
   const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const weeklyData = weekDays.map((day, index) => {
@@ -160,18 +178,22 @@ const Dashboard = async () => {
     .eq("user_id", data.user.id)
     .single();
 
-  // Get all paid and unpaid logs
+  // Get all paid and unpaid logs for the selected month
   const { data: paidLogs } = await supabase
     .from("work_logs")
     .select("*")
     .eq("user_id", data.user.id)
-    .eq("paid", true);
+    .eq("paid", true)
+    .gte("date", selectedMonthStart.toISOString())
+    .lte("date", selectedMonthEnd.toISOString());
 
   const { data: unpaidLogs } = await supabase
     .from("work_logs")
     .select("*")
     .eq("user_id", data.user.id)
-    .eq("paid", false);
+    .eq("paid", false)
+    .gte("date", selectedMonthStart.toISOString())
+    .lte("date", selectedMonthEnd.toISOString());
 
   const totalPaidEarnings = calculateTotalEarnings(paidLogs || []);
   const totalUnpaidEarnings = calculateTotalEarnings(unpaidLogs || []);
@@ -200,7 +222,7 @@ const Dashboard = async () => {
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <div className="flex w-full sm:w-auto">
           <div className="flex items-center gap-4">
-            <ClockButton />
+            <ClockStatus />
             <LogHoursButton
               defaultHourlyRate={default_hourly_rate?.default_wage}
               timeFormat={userProfile?.time_format ?? "12h"}
@@ -211,11 +233,30 @@ const Dashboard = async () => {
       </div>
 
       <div className="container space-y-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Monthly Overview</h3>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" asChild className="h-8 w-8">
+              <a href={`?month=${prevMonth}`}>
+                <ChevronLeft className="h-4 w-4" />
+              </a>
+            </Button>
+            <span className="text-sm">
+              {format(selectedMonth, "MMMM yyyy")}
+            </span>
+            <Button variant="outline" size="icon" asChild className="h-8 w-8">
+              <a href={`?month=${nextMonth}`}>
+                <ChevronRight className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Paid Earnings
+                Month&apos;s Paid Earnings
               </CardTitle>
               <CurrencyIcon className="h-4 w-4 text-green-500" />
             </CardHeader>
@@ -240,25 +281,6 @@ const Dashboard = async () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Hours This Week
-              </CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {currentWeekHours.toFixed(1)}h
-              </div>
-              <div className="mt-1 flex items-center gap-2">
-                <p className="text-xs text-muted-foreground">
-                  {hoursChange >= 0 ? "+" : ""}
-                  {hoursChange.toFixed(1)}h from last week
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
                 This Month&apos;s Earnings
               </CardTitle>
               <CurrencyIcon className="h-4 w-4 text-muted-foreground" />
@@ -266,7 +288,7 @@ const Dashboard = async () => {
             <CardContent>
               <div className="text-2xl font-bold">
                 {currencySymbol}
-                {currentMonthEarnings.toFixed(2)}
+                {selectedMonthEarnings.toFixed(2)}
               </div>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-xs text-muted-foreground">
@@ -304,6 +326,32 @@ const Dashboard = async () => {
                 <p className="text-xs text-muted-foreground">
                   {averageHoursChange >= 0 ? "+" : ""}
                   {averageHoursChange.toFixed(1)}h from last month
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Weekly Overview</h3>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Hours This Week
+              </CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {currentWeekHours.toFixed(1)}h
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {hoursChange >= 0 ? "+" : ""}
+                  {hoursChange.toFixed(1)}h from last week
                 </p>
               </div>
             </CardContent>

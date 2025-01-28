@@ -30,7 +30,7 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect("/account/onboarding");
 
   if (user && (path === "/login" || path === "/signup"))
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/time-tracker", request.url));
 
   if (!user && !isPublicRoute) {
     const redirectUrl = new URL("/login", request.url);
@@ -39,7 +39,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   if (user && isPublicRoute)
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/time-tracker", request.url));
 
   return response;
 }

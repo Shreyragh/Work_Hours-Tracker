@@ -14,15 +14,18 @@ export function ClockPageClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [hourlyRate, setHourlyRate] = useState(15);
   const [currency, setCurrency] = useState("USD");
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const supabase = createClient();
+
     const fetchUserProfile = async () => {
-      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (user) {
+        setUserId(user.id);
         const { data: userProfile } = await supabase
           .from("user_profiles")
           .select("default_wage, currency")
@@ -40,14 +43,68 @@ export function ClockPageClient() {
   }, []);
 
   useEffect(() => {
-    getCurrentClockStatus()
-      .then((status) => {
+    const fetchAndSetClockStatus = async () => {
+      try {
+        const status = await getCurrentClockStatus();
         setClockInTime(status.clockInTime || null);
-      })
-      .finally(() => {
+      } catch (error) {
+        console.error("Error fetching clock status:", error);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchAndSetClockStatus();
   }, []);
+
+  // Set up real-time subscription for clock status changes
+  useEffect(() => {
+    if (!userId) return;
+
+    const supabase = createClient();
+
+    // Create a channel with a unique name
+    const channel = supabase.channel(`clock_sessions_${userId}`);
+
+    // Set up the subscription
+    channel
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "clock_sessions",
+          filter: `user_id=eq.${userId}`,
+        },
+        async () => {
+          const status = await getCurrentClockStatus();
+          setClockInTime(status.clockInTime || null);
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "clock_sessions",
+          filter: `user_id=eq.${userId}`,
+        },
+        async () => {
+          const status = await getCurrentClockStatus();
+          setClockInTime(status.clockInTime || null);
+        },
+      )
+      .subscribe();
+
+    // For debugging
+    console.log("Subscribed to clock_sessions changes for user:", userId);
+
+    // Cleanup function
+    return () => {
+      console.log("Cleaning up subscription");
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -132,7 +189,14 @@ export function ClockPageClient() {
           </p>
         )}
       </div>
-      <ClockButton />
+      <ClockButton
+        isClocked={!!clockInTime}
+        onClockChange={() =>
+          getCurrentClockStatus().then((status) =>
+            setClockInTime(status.clockInTime || null),
+          )
+        }
+      />
     </div>
   );
 }
