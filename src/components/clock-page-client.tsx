@@ -5,20 +5,39 @@ import { format, parseISO, differenceInSeconds } from "date-fns";
 import { getCurrentClockStatus } from "@/actions/clock";
 import { ClockButton } from "./clock-button";
 import { Spinner } from "./ui/spinner";
+import { createClient } from "@/lib/supabase/client";
 
-interface ClockPageClientProps {
-  hourlyRate: number;
-  currency: string;
-}
-
-export function ClockPageClient({
-  hourlyRate,
-  currency,
-}: ClockPageClientProps) {
+export function ClockPageClient() {
   const [clockInTime, setClockInTime] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [earnings, setEarnings] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [hourlyRate, setHourlyRate] = useState(15);
+  const [currency, setCurrency] = useState("USD");
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: userProfile } = await supabase
+          .from("user_profiles")
+          .select("default_wage, currency")
+          .eq("user_id", user.id)
+          .single();
+
+        if (userProfile) {
+          setHourlyRate(userProfile.default_wage || 15);
+          setCurrency(userProfile.currency || "USD");
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   useEffect(() => {
     getCurrentClockStatus()

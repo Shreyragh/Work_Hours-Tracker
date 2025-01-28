@@ -37,13 +37,10 @@ const Dashboard = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
 
-  if (error || !data?.user) {
-    redirect("/login");
-  }
+  if (error || !data?.user) return redirect("/login");
 
-  if (!data.user.user_metadata?.onboarding_completed) {
-    redirect("/account/onboarding");
-  }
+  if (!data.user.user_metadata?.onboarding_completed)
+    return redirect("/account/onboarding");
 
   const { data: default_hourly_rate } = await supabase
     .from("user_profiles")

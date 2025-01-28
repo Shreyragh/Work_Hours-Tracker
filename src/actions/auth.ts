@@ -21,8 +21,9 @@ export async function login(formData: FormData) {
     redirect("/login?error=loginError");
   }
 
+  revalidatePath("/");
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect("/time-tracker");
 }
 
 export async function signup(formData: FormData) {
@@ -41,6 +42,7 @@ export async function signup(formData: FormData) {
     redirect("/signup?error=signupError");
   }
 
+  revalidatePath("/");
   revalidatePath("/", "layout");
   redirect("/login");
 }
@@ -49,6 +51,7 @@ export async function signout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
 
+  revalidatePath("/");
   revalidatePath("/", "layout");
   redirect("/login");
 }
