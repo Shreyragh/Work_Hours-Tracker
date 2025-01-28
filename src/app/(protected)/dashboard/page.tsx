@@ -40,7 +40,7 @@ export const revalidate = 3600;
 const Dashboard = async ({
   searchParams,
 }: {
-  searchParams: { month?: string };
+  searchParams: Promise<{ month?: string }>;
 }) => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
@@ -58,9 +58,8 @@ const Dashboard = async ({
 
   // Handle month navigation
   const today = new Date();
-  const selectedMonth = searchParams.month
-    ? new Date(searchParams.month)
-    : today;
+  const { month } = await searchParams;
+  const selectedMonth = month ? new Date(month) : today;
   const prevMonth = format(subMonths(selectedMonth, 1), "yyyy-MM");
   const nextMonth = format(addMonths(selectedMonth, 1), "yyyy-MM");
 
