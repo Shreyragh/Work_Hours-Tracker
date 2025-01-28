@@ -96,12 +96,8 @@ export function ClockPageClient() {
       )
       .subscribe();
 
-    // For debugging
-    console.log("Subscribed to clock_sessions changes for user:", userId);
-
     // Cleanup function
     return () => {
-      console.log("Cleaning up subscription");
       supabase.removeChannel(channel);
     };
   }, [userId]);

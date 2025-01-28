@@ -38,7 +38,6 @@ export function ClockStatus() {
     fetchAndSetClockStatus();
   }, []);
 
-  // Set up real-time subscription for clock status changes
   useEffect(() => {
     if (!userId) return;
 
@@ -47,7 +46,6 @@ export function ClockStatus() {
     // Create a channel with a unique name
     const channel = supabase.channel(`clock_sessions_${userId}`);
 
-    // Set up the subscription
     channel
       .on(
         "postgres_changes",
@@ -77,15 +75,7 @@ export function ClockStatus() {
       )
       .subscribe();
 
-    // For debugging
-    console.log(
-      "Dashboard: Subscribed to clock_sessions changes for user:",
-      userId,
-    );
-
-    // Cleanup function
     return () => {
-      console.log("Dashboard: Cleaning up subscription");
       supabase.removeChannel(channel);
     };
   }, [userId]);
