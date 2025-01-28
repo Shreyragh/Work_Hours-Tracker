@@ -12,21 +12,32 @@ export async function GET(
 
   // Verify the token
   const { data: profile } = await supabase
-    .from("user_profiles")
+    .from("calendar_tokens")
     .select("calendar_token")
     .eq("user_id", userId)
     .single();
 
-  if (profile?.calendar_token !== token.substr(0, token.length - 4)) {
+  console.log(profile);
+
+  console.log("Debug token verification:", {
+    storedToken: profile?.calendar_token,
+    receivedToken: token,
+    slicedToken: token.slice(0, -4),
+    match: profile?.calendar_token === token.slice(0, -4),
+  });
+
+  if (profile?.calendar_token !== token.slice(0, -4)) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
   // Fetch work logs
   const { data: logs } = await supabase
-    .from("work_logs")
+    .from("calendar_work_logs")
     .select("*")
     .eq("user_id", userId)
     .order("start_time", { ascending: true });
+
+  console.log("Work logs:", logs);
 
   if (!logs) {
     return new NextResponse("No logs found", { status: 404 });
@@ -41,8 +52,15 @@ export async function GET(
     ttl: 60,
   });
 
-  // Add events for each work log
+  // Add some debug logging in the forEach
   logs.forEach((log) => {
+    console.log("Processing log:", {
+      hasRequiredFields: !!(log.date && log.start_time && log.end_time),
+      date: log.date,
+      start_time: log.start_time,
+      end_time: log.end_time,
+    });
+
     if (log.date && log.start_time && log.end_time) {
       // Parse the date and times
       const date = new Date(log.date);
