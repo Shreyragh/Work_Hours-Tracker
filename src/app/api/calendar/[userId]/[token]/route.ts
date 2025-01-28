@@ -32,11 +32,13 @@ export async function GET(
     return new NextResponse("No logs found", { status: 404 });
   }
 
-  // Create calendar
+  // Create calendar with more detailed configuration
   const calendar = ical({
     name: "Work Hours",
     description: "Your logged work hours",
     timezone: "UTC",
+    url: request.url,
+    ttl: 60,
   });
 
   // Add events for each work log
@@ -49,21 +51,23 @@ export async function GET(
 
       // Create start and end dates by combining date with times
       const startDate = new Date(date);
-      startDate.setHours(startHour, startMinute, 0);
+      startDate.setUTCHours(startHour, startMinute, 0);
 
       const endDate = new Date(date);
-      endDate.setHours(endHour, endMinute, 0);
+      endDate.setUTCHours(endHour, endMinute, 0);
 
-      // Calculate hours
-      const hours = Math.round(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60),
-      );
+      // Calculate duration in hours and minutes
+      const durationMs = endDate.getTime() - startDate.getTime();
+      const hours = Math.floor(durationMs / (1000 * 60 * 60));
+      const minutes = Math.round((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
       calendar.createEvent({
         start: startDate,
         end: endDate,
-        summary: `Work: ${hours} hours`,
+        summary: `Work: ${hours}h${minutes > 0 ? ` ${minutes}m` : ""}`,
         description: log.notes || "No description provided",
+        created: new Date(log.created_at || Date.now()),
+        lastModified: new Date(log.updated_at || Date.now()),
       });
     }
   });
@@ -74,8 +78,11 @@ export async function GET(
   // Return the calendar data with appropriate headers
   return new NextResponse(icalData, {
     headers: {
-      "Content-Type": "text/calendar",
+      "Content-Type": "text/calendar; charset=utf-8",
       "Content-Disposition": `attachment; filename="work-hours.ics"`,
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
     },
   });
 }
