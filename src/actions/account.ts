@@ -17,7 +17,7 @@ export async function updateGeneralSettings(formData: FormData) {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   const firstName = formData.get("firstName") as string;

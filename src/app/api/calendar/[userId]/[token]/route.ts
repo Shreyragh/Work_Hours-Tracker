@@ -18,7 +18,7 @@ export async function GET(
     .single();
 
   if (profile?.calendar_token !== token.slice(0, -4)) {
-    return new NextResponse("Unauthorized", { status: 401 });
+    return new NextResponse("Unauthorised", { status: 401 });
   }
 
   // Fetch work logs

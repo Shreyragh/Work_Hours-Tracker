@@ -11,7 +11,7 @@ export async function createWorkLog(formData: FormData) {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   const date = formData.get("date") as string;
@@ -51,7 +51,7 @@ export async function updateWorkLog(formData: FormData) {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   const id = Number(formData.get("id") as string);
@@ -98,7 +98,7 @@ export async function deleteWorkLog(id: number) {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      throw new Error("Unauthorized");
+      throw new Error("Unauthorised");
     }
 
     const { error } = await supabase

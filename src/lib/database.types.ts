@@ -187,21 +187,15 @@ export type Database = {
       }
     }
     Functions: {
-      is_organization_admin: {
+      get_users_by_ids: {
         Args: {
-          org_id: string
+          user_ids: string[]
         }
-        Returns: boolean
-      }
-      is_organization_owner: {
-        Args: {
-          org_id: string
-        }
-        Returns: boolean
+        Returns: Json
       }
     }
     Enums: {
-      organization_role: "owner" | "admin" | "member"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never

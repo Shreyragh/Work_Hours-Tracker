@@ -58,7 +58,12 @@ export default function LogsClient({
     endTime: "",
   });
 
-  const currencySymbol = userProfile?.currency ?? "£";
+  const currencySymbol =
+    userProfile?.currency === "usd"
+      ? "$"
+      : userProfile?.currency === "eur"
+        ? "€"
+        : "£";
 
   const fetchLogs = useCallback(async () => {
     const supabase = createClient();

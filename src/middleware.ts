@@ -8,7 +8,7 @@ export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Allow calendar API requests to bypass auth
-  if (path.startsWith("/api/calendar/")) {
+  if (path.startsWith("/api/calendar/") || path.startsWith("/auth/confirm")) {
     return NextResponse.next();
   }
 
@@ -26,8 +26,14 @@ export default async function middleware(request: NextRequest) {
 
   const isPublicRoute = publicRoutes.includes(path);
 
-  if (user && !user.user_metadata?.onboarding_completed)
-    return NextResponse.redirect("/account/onboarding");
+  if (
+    user &&
+    !user.user_metadata?.onboarding_completed &&
+    path !== "/account/onboarding"
+  )
+    return NextResponse.redirect(
+      process.env.NEXT_PUBLIC_APP_URL + "/account/onboarding",
+    );
 
   if (user && (path === "/login" || path === "/signup"))
     return NextResponse.redirect(new URL("/time-tracker", request.url));

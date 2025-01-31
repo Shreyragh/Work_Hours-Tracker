@@ -11,7 +11,7 @@ export async function clockIn() {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   // Check if user already has an active session
@@ -52,7 +52,7 @@ export async function clockOut() {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   // Get active session
@@ -111,7 +111,7 @@ export async function getCurrentClockStatus() {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorised");
   }
 
   const { data: activeSession } = await supabase
