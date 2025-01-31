@@ -66,7 +66,6 @@ const LogsFilters = ({ filters, setFilters }: LogsFiltersProps) => {
             onSelect={(date) =>
               setFilters((prev) => ({ ...prev, month: date }))
             }
-            initialFocus
           />
         </PopoverContent>
       </Popover>

@@ -126,7 +126,11 @@ export const LogHoursButton = ({
             </CardContent>
           </Card>
 
-          <form onSubmit={handleSubmit} id="work-log-form" className="grid gap-4 py-4">
+          <form
+            onSubmit={handleSubmit}
+            id="work-log-form"
+            className="grid gap-4 py-4"
+          >
             <div className="grid gap-2">
               <Label htmlFor="date">Date</Label>
               <Popover>
@@ -143,12 +147,7 @@ export const LogHoursButton = ({
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
+                  <Calendar mode="single" selected={date} onSelect={setDate} />
                 </PopoverContent>
               </Popover>
             </div>
@@ -161,7 +160,10 @@ export const LogHoursButton = ({
                 onChange={(e) => setStartTime(e.target.value)}
               />
               <p className="text-sm text-muted-foreground">
-                {formatTimeString(startTime + ":00", timeFormat as "12h" | "24h")}
+                {formatTimeString(
+                  startTime + ":00",
+                  timeFormat as "12h" | "24h",
+                )}
               </p>
             </div>
             <div className="grid gap-2">
@@ -229,10 +231,10 @@ export const LogHoursButton = ({
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             form="work-log-form"
-            type="submit" 
-            className="w-full sm:w-auto" 
+            type="submit"
+            className="w-full sm:w-auto"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : "Save"}
