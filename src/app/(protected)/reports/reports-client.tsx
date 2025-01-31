@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Database } from "@/lib/database.types";
+import { exportToCSV } from "@/lib/exportToCsv";
 import { calculateHoursWorked, cn } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
 import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
@@ -120,57 +121,6 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
     return acc;
   }, []);
 
-  // Export data to CSV
-  const exportToCSV = () => {
-    if (!filteredLogs) return;
-
-    const headers = [
-      "Date",
-      "Start Time",
-      "End Time",
-      "Hours Worked",
-      "Rate",
-      "Earnings",
-      "Notes",
-    ];
-
-    const rows = filteredLogs.map((log) => {
-      const hours = calculateHoursWorked(log.start_time!, log.end_time!);
-      const rate = log.default_rate
-        ? userProfile?.default_wage
-        : log.custom_rate;
-      const earnings = hours * (rate ?? 0);
-
-      return [
-        format(new Date(log.date!), "yyyy-MM-dd"),
-        log.start_time,
-        log.end_time,
-        hours.toFixed(2),
-        `${currencySymbol}${rate?.toFixed(2)}`,
-        `${currencySymbol}${earnings.toFixed(2)}`,
-        log.notes || "",
-      ];
-    });
-
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
-      .join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute(
-      "download",
-      `work-report-${format(dateRange?.from ?? new Date(), "yyyy-MM-dd")}-to-${format(
-        dateRange?.to ?? new Date(),
-        "yyyy-MM-dd",
-      )}.csv`,
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <div className="flex-1 space-y-4 pb-8 pt-6">
       <div className="container flex flex-col gap-4 space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
@@ -223,7 +173,12 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
               />
             </PopoverContent>
           </Popover>
-          <Button onClick={exportToCSV} className="w-full sm:w-auto">
+          <Button
+            onClick={() =>
+              exportToCSV(filteredLogs, userProfile, currencySymbol, dateRange)
+            }
+            className="w-full sm:w-auto"
+          >
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
