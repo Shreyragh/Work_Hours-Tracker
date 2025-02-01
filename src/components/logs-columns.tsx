@@ -7,7 +7,7 @@ import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ArrowUpDown } from "lucide-react";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/types/database.types";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 
@@ -180,8 +180,8 @@ export const columns = (
       },
       accessorFn: (row) => {
         const rate = row.default_rate
-          ? userProfile?.default_wage ?? 0
-          : row.custom_rate ?? 0;
+          ? (userProfile?.default_wage ?? 0)
+          : (row.custom_rate ?? 0);
         return rate;
       },
     },
@@ -219,8 +219,8 @@ export const columns = (
       accessorFn: (row) => {
         if (!row.start_time || !row.end_time) return null;
         const rate = row.default_rate
-          ? userProfile?.default_wage ?? 0
-          : row.custom_rate ?? 0;
+          ? (userProfile?.default_wage ?? 0)
+          : (row.custom_rate ?? 0);
         return calculateHoursWorked(row.start_time, row.end_time) * rate;
       },
     },

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/types/database.types";
 import { createClient } from "@/lib/supabase/server";
 import { calculateHoursWorked, formatTimeString } from "@/lib/utils";
 import {

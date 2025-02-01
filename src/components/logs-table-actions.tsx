@@ -6,7 +6,7 @@ import { useState } from "react";
 import EditLogDialog from "./edit-log-dialog";
 import DeleteLogDialog from "./delete-log-dialog";
 import { format } from "date-fns";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/types/database.types";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
 

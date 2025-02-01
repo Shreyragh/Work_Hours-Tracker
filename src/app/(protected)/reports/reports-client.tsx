@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/types/database.types";
 import { exportToCSV } from "@/lib/exportToCsv";
 import { calculateHoursWorked, cn } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
