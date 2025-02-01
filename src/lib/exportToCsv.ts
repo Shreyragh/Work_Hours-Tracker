@@ -1,6 +1,6 @@
 import { calculateHoursWorked } from "@/lib/utils";
 import { format } from "date-fns";
-import { Database } from "./database.types";
+import { Database } from "@/types/database.types";
 import { DateRange } from "react-day-picker";
 
 type WorkLog = Database["public"]["Tables"]["work_logs"]["Row"];
