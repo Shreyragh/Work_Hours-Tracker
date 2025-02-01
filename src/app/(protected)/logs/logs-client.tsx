@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/types/database.types";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { DollarSign, Filter, Trash2 } from "lucide-react";
@@ -141,6 +141,30 @@ export default function LogsClient({
     } else {
       toast({
         description: "Successfully marked logs as paid",
+      });
+      setSelectedRows([]);
+      fetchLogs();
+    }
+  };
+
+  const handleMarkAsUnpaid = async () => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("work_logs")
+      .update({ paid: false })
+      .in("id", selectedRows.map(Number))
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to mark logs as unpaid",
+      });
+      console.error(error);
+    } else {
+      toast({
+        description: "Successfully marked logs as unpaid",
       });
       setSelectedRows([]);
       fetchLogs();
@@ -276,6 +300,15 @@ export default function LogsClient({
             >
               <DollarSign className="h-4 w-4" />
               Mark as Paid ({selectedRows.length})
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleMarkAsUnpaid}
+              className="gap-2"
+            >
+              <DollarSign className="h-4 w-4" />
+              Mark as Unpaid ({selectedRows.length})
             </Button>
           </div>
         )}
