@@ -1,5 +1,6 @@
 import { ClockPageClient } from "@/components/clock-page-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Suspense } from "react";
 
 const TimeTrackerPage = () => {
   return (
@@ -9,7 +10,9 @@ const TimeTrackerPage = () => {
           <CardTitle className="text-center text-2xl">Time Tracker</CardTitle>
         </CardHeader>
         <CardContent>
-          <ClockPageClient />
+          <Suspense>
+            <ClockPageClient />
+          </Suspense>
         </CardContent>
       </Card>
     </div>
