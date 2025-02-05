@@ -12,7 +12,7 @@ import { Database } from "@/types/database.types";
 import { exportToCSV } from "@/lib/exportToCsv";
 import { calculateHoursWorked, cn } from "@/lib/utils";
 import { User } from "@supabase/supabase-js";
-import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import {
   CalendarIcon,
   Clock,
@@ -56,7 +56,7 @@ interface DailyData {
 
 const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: startOfMonth(subMonths(new Date(), 1)),
+    from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
   });
 

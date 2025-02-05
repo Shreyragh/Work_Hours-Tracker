@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface LogHoursButtonProps {
   defaultHourlyRate?: number | null;
-  timeFormat: "12h" | "24h" | string;
+  timeFormat?: "12h" | "24h" | string | null;
   currencySymbol: string;
 }
 
@@ -39,7 +39,7 @@ export const LogHoursButton = ({
 }: LogHoursButtonProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [dateRange, setDateRange] = useState<Date[]>([new Date()]);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
   const [useDefaultWage, setUseDefaultWage] = useState<boolean>(true);
@@ -48,24 +48,37 @@ export const LogHoursButton = ({
 
   const hoursWorked = calculateHoursWorked(startTime + ":00", endTime + ":00");
   const currentRate = useDefaultWage ? defaultHourlyRate : rate;
-  const earnings = hoursWorked * currentRate!;
+  const daysCount = dateRange.length;
+  const totalHoursWorked = hoursWorked * daysCount;
+  const earnings = totalHoursWorked * currentRate!;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData();
-      formData.append("date", date?.toISOString() ?? new Date().toISOString());
-      formData.append("startTime", startTime);
-      formData.append("endTime", endTime);
-      formData.append("useDefaultWage", useDefaultWage.toString());
-      if (!useDefaultWage) {
-        formData.append("rate", rate.toString());
-      }
-      formData.append("notes", (e.target as HTMLFormElement).notes.value);
+      const notes = (e.target as HTMLFormElement).notes.value;
 
-      const result = await createWorkLog(formData);
+      // Create a work log for each selected date
+      const results = await Promise.all(
+        dateRange.map(async (date) => {
+          const formData = new FormData();
+          formData.append("date", date.toISOString());
+          formData.append("startTime", startTime);
+          formData.append("endTime", endTime);
+          formData.append("useDefaultWage", useDefaultWage.toString());
+          if (!useDefaultWage) {
+            formData.append("rate", rate.toString());
+          }
+          formData.append("notes", notes);
+
+          return createWorkLog(formData);
+        }),
+      );
+
+      const result = {
+        success: results.every((r) => r.success),
+      };
 
       if (result.success) {
         toast({
@@ -107,7 +120,10 @@ export const LogHoursButton = ({
             <CardContent className="grid gap-2 p-0 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Hours Worked:</span>
-                <span className="font-medium">{hoursWorked.toFixed(2)}h</span>
+                <span className="font-medium">
+                  {totalHoursWorked.toFixed(2)}h ({daysCount}{" "}
+                  {daysCount === 1 ? "day" : "days"})
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Rate:</span>
@@ -139,15 +155,29 @@ export const LogHoursButton = ({
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground",
+                      !dateRange.length && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    {dateRange.length > 0 ? (
+                      dateRange.length === 1 ? (
+                        format(dateRange[0], "PPP")
+                      ) : (
+                        `${dateRange.length} days selected`
+                      )
+                    ) : (
+                      <span>Pick dates</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={date} onSelect={setDate} />
+                  <Calendar
+                    mode="multiple"
+                    selected={dateRange}
+                    onSelect={(dates: Date[] | undefined) => {
+                      setDateRange(dates || []);
+                    }}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -162,7 +192,7 @@ export const LogHoursButton = ({
               <p className="text-sm text-muted-foreground">
                 {formatTimeString(
                   startTime + ":00",
-                  timeFormat as "12h" | "24h",
+                  (timeFormat as "12h" | "24h") || "12h",
                 )}
               </p>
             </div>
@@ -175,7 +205,10 @@ export const LogHoursButton = ({
                 onChange={(e) => setEndTime(e.target.value)}
               />
               <p className="text-sm text-muted-foreground">
-                {formatTimeString(endTime + ":00", timeFormat as "12h" | "24h")}
+                {formatTimeString(
+                  endTime + ":00",
+                  (timeFormat as "12h" | "24h") || "12h",
+                )}
               </p>
             </div>
             <div className="grid gap-4">
