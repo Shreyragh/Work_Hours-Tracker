@@ -22,6 +22,7 @@ import {
   PoundSterling,
   TrendingUp,
   Users,
+  CircleDollarSign,
 } from "lucide-react";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
@@ -65,14 +66,18 @@ const ReportsClient = ({ userProfile, initialLogs }: ReportsClientProps) => {
       ? "$"
       : userProfile?.currency === "eur"
         ? "€"
-        : "£";
+        : userProfile?.currency === "gbp"
+          ? "£"
+          : "₹";
 
   const CurrencyIcon =
     userProfile?.currency === "usd"
       ? DollarSign
       : userProfile?.currency === "eur"
         ? EuroIcon
-        : PoundSterling;
+        : userProfile?.currency === "inr"
+          ? CircleDollarSign
+          : PoundSterling;
 
   // Filter logs based on date range
   const filteredLogs = initialLogs?.filter((log) => {

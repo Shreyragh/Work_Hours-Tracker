@@ -83,16 +83,32 @@ export async function clockOut() {
   }
 
   // Create work log
+  const clockInTime = new Date(activeSession.clock_in_time);
+  const clockOutTime = new Date(now);
+  
+  // Try creating full timestamps instead of just time
+  const workDate = now.split("T")[0]; // YYYY-MM-DD
+  const startTimeStr = clockInTime.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+  const endTimeStr = clockOutTime.toISOString().split('T')[1].split('.')[0]; // HH:MM:SS
+  
   const { error: workLogError } = await supabase.from("work_logs").insert({
     user_id: user.id,
-    date: now.split("T")[0],
-    start_time: activeSession.clock_in_time.split("T")[1].split(".")[0],
-    end_time: now.split("T")[1].split(".")[0],
+    date: workDate,
+    start_time: `${workDate} ${startTimeStr}`,
+    end_time: `${workDate} ${endTimeStr}`,
     default_rate: true,
   });
 
   if (workLogError) {
-    throw new Error("Failed to create work log");
+    console.error("Work log creation error:", workLogError);
+    console.error("Work log data:", {
+      user_id: user.id,
+      date: workDate,
+      start_time: `${workDate} ${startTimeStr}`,
+      end_time: `${workDate} ${endTimeStr}`,
+      default_rate: true,
+    });
+    throw new Error(`Failed to create work log: ${workLogError.message}`);
   }
 
   revalidatePath("/logs");

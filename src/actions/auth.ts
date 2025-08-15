@@ -15,10 +15,24 @@ export async function login(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data: loginData, error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    redirect("/login?error=loginError");
+    console.error('Login error:', error.message);
+    redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Check if user needs to complete onboarding
+  if (loginData.user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('onboarding_completed')
+      .eq('user_id', loginData.user.id)
+      .single();
+
+    if (!profile?.onboarding_completed) {
+      redirect("/account/onboarding");
+    }
   }
 
   revalidatePath("/");
@@ -36,10 +50,16 @@ export async function signup(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signUp(data);
+  const { data: signUpData, error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/signup?error=signupError");
+    console.error('Signup error:', error.message);
+    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Check if email confirmation is required
+  if (signUpData.user && !signUpData.user.email_confirmed_at) {
+    redirect("/signup?message=Please check your email to confirm your account before signing in.");
   }
 
   revalidatePath("/");

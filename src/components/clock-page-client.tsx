@@ -13,7 +13,7 @@ export function ClockPageClient() {
   const [earnings, setEarnings] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hourlyRate, setHourlyRate] = useState(15);
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("inr");
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function ClockPageClient() {
 
         if (userProfile) {
           setHourlyRate(userProfile.default_wage || 15);
-          setCurrency(userProfile.currency || "USD");
+          setCurrency(userProfile.currency || "inr");
         }
       }
     };
@@ -139,12 +139,8 @@ export function ClockPageClient() {
   };
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
+    const currencySymbol = currency === "usd" ? "$" : currency === "eur" ? "€" : currency === "gbp" ? "£" : "₹";
+    return `${currencySymbol}${amount.toFixed(2)}`;
   };
 
   if (isLoading) {

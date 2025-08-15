@@ -30,6 +30,8 @@ export const columns = (
         return "€";
       case "gbp":
         return "£";
+      case "inr":
+        return "₹";
       default:
         return "£";
     }

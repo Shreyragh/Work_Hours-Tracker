@@ -81,7 +81,7 @@ const OnboardingPage = async () => {
                 <h3 className="text-lg font-medium">Work Preferences</h3>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="defaultWage">Default Hourly Wage (£)</Label>
+                    <Label htmlFor="defaultWage">Default Hourly Wage (₹)</Label>
                     <Input
                       id="defaultWage"
                       name="defaultWage"
@@ -111,7 +111,7 @@ const OnboardingPage = async () => {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="currency">Preferred Currency</Label>
-                    <Select name="currency" defaultValue="gbp">
+                    <Select name="currency" defaultValue="inr">
                       <SelectTrigger>
                         <SelectValue placeholder="Select your currency" />
                       </SelectTrigger>
@@ -119,6 +119,7 @@ const OnboardingPage = async () => {
                         <SelectItem value="gbp">British Pound (£)</SelectItem>
                         <SelectItem value="usd">US Dollar ($)</SelectItem>
                         <SelectItem value="eur">Euro (€)</SelectItem>
+                        <SelectItem value="inr">Indian Rupee (₹)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

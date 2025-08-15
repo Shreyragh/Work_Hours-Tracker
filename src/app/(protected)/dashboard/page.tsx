@@ -29,6 +29,7 @@ import {
   PoundSterling,
   ChevronLeft,
   ChevronRight,
+  CircleDollarSign,
 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -206,14 +207,18 @@ const Dashboard = async ({
       ? "$"
       : userProfile?.currency === "eur"
         ? "€"
-        : "£";
+        : userProfile?.currency === "gbp"
+          ? "£"
+          : "₹";
 
   const CurrencyIcon =
     userProfile?.currency === "usd"
       ? DollarSign
       : userProfile?.currency === "eur"
         ? EuroIcon
-        : PoundSterling;
+        : userProfile?.currency === "inr"
+          ? CircleDollarSign
+          : PoundSterling;
 
   return (
     <div className="flex-1 space-y-4 pb-8 pt-6">

@@ -118,7 +118,7 @@ const Account = async () => {
                     <div className="grid gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="defaultWage">
-                          Default Hourly Rate (£)
+                          Default Hourly Rate (₹)
                         </Label>
                         <Input
                           id="defaultWage"
@@ -201,6 +201,7 @@ const Account = async () => {
                             </SelectItem>
                             <SelectItem value="usd">US Dollar ($)</SelectItem>
                             <SelectItem value="eur">Euro (€)</SelectItem>
+                            <SelectItem value="inr">Indian Rupee (₹)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

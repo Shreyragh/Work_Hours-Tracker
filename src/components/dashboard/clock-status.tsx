@@ -8,8 +8,10 @@ import { ClockButton } from "../clock-button";
 export function ClockStatus() {
   const [clockInTime, setClockInTime] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const supabase = createClient();
 
     const fetchUserProfile = async () => {
@@ -79,6 +81,15 @@ export function ClockStatus() {
       supabase.removeChannel(channel);
     };
   }, [userId]);
+
+  if (!mounted) {
+    return (
+      <ClockButton
+        isClocked={false}
+        onClockChange={() => {}}
+      />
+    );
+  }
 
   return (
     <ClockButton

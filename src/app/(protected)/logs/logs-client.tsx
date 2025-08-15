@@ -63,7 +63,9 @@ export default function LogsClient({
       ? "$"
       : userProfile?.currency === "eur"
         ? "€"
-        : "£";
+        : userProfile?.currency === "gbp"
+          ? "£"
+          : "₹";
 
   const fetchLogs = useCallback(async () => {
     const supabase = createClient();
