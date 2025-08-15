@@ -82,8 +82,6 @@ organisations
  
  5. ###Start Development
  ```
- pnpm dev
- ```
  ## 🧭 Key Usage Flow
 🔐 Sign Up via the authentication page
 
