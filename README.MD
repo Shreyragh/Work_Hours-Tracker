@@ -86,14 +86,14 @@ organisations
 🔐 Sign Up via the authentication page
 
 👤 Complete Onboarding with profile setup
-
+---
 🕒 Start Tracking instantly from the dashboard
 ### 🔐 Sign Up via the authentication page
 
 ### 👤 Complete Onboarding with profile setup
 
 ### 🕒 Start Tracking instantly from the dashboard
-
+---
 ## 🧪 Dev Commands
 | Command      | Description              |
 | ------------ | ------------------------ |
@@ -101,28 +101,25 @@ organisations
 | `pnpm build` | Build for production     |
 | `pnpm start` | Launch production server |
 | `pnpm lint`  | Run linting checks       |
-
+---
 ### 🛠️ Troubleshooting
 Ensure all environment variables are set
 
 Verify Supabase tables exist and are correctly configured
 
 Check browser console/network tab for runtime issues
-
+---
 ### 🤝 Contributing
 Pull requests and issue reports are welcome!
 Please follow the project's style guide and commit naming conventions.
-
+---
 ## 📸 Screenshots
 Supports light and dark themes to match your vibe.
-
+---
 ### 📬 Contact
 For questions or collaboration:📧 shreyraghuvanshi10@gmail.com
 
-
-
-
-
+---
 
 ### 🔐 Set up Supabase Database
 # 1. Visit https://supabase.com/dashboard
