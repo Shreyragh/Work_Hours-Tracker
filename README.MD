@@ -117,7 +117,7 @@ For questions or collaboration:📧 shreyraghuvanshi10@gmail.com
 ---
 ## 🔐 Set up Supabase Database
 ### 1. Visit https://supabase.com/dashboard
-### 2. Select your project: `oamgyflffgixaynwddsq`
+### 2. Select your project: `work_hours_web`
 ### 3. Go to "SQL Editor" in the left sidebar
 ### 4. Copy and paste the entire content from `database-setup.sql`
 ### Install Dependencies
