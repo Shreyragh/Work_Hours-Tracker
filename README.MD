@@ -83,11 +83,7 @@ organisations
  5. ###Start Development
  ```
  ## 🧭 Key Usage Flow
-🔐 Sign Up via the authentication page
 
-👤 Complete Onboarding with profile setup
----
-🕒 Start Tracking instantly from the dashboard
 ### 🔐 Sign Up via the authentication page
 
 ### 👤 Complete Onboarding with profile setup
@@ -118,12 +114,10 @@ Supports light and dark themes to match your vibe.
 ---
 ### 📬 Contact
 For questions or collaboration:📧 shreyraghuvanshi10@gmail.com
-
 ---
-
-### 🔐 Set up Supabase Database
-# 1. Visit https://supabase.com/dashboard
-# 2. Select your project: `oamgyflffgixaynwddsq`
-# 3. Go to "SQL Editor" in the left sidebar
-# 4. Copy and paste the entire content from `database-setup.sql`
-# Install Dependencies
+## 🔐 Set up Supabase Database
+### 1. Visit https://supabase.com/dashboard
+### 2. Select your project: `oamgyflffgixaynwddsq`
+### 3. Go to "SQL Editor" in the left sidebar
+### 4. Copy and paste the entire content from `database-setup.sql`
+### Install Dependencies
